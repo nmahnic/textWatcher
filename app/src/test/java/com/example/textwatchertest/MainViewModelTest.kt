@@ -3,9 +3,10 @@ package com.example.textwatchertest
 import android.text.Editable
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.spy
+import com.nhaarman.mockitokotlin2.times
+import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
@@ -39,16 +40,22 @@ class MainViewModelTest {
 
         viewModel.cityTextWatcher.afterTextChanged(editable)
 
-        assertEquals( editable.toString(), validCity)
+        val times = if(cityToEvaluate == validCity) ZERO else ONE
+        verify(editable, times(times)).replace(0, editable.length, validCity)
+
     }
 
     companion object {
         @JvmStatic
         fun cities() = listOf(
+            Arguments.of("hola", "hola"),
             Arguments.of("@", ""),
             Arguments.of("hola@hola", "holahola"),
             Arguments.of("hola@", "hola"),
         )
+
+        private const val ONE = 1
+        private const val ZERO = 0
     }
 
 }
